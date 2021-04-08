@@ -12,7 +12,7 @@
     position: relative;
 }
 
-.main::before {
+/* .main::before {
     content: "";
     position: absolute;
     height: 30%;
@@ -21,7 +21,7 @@
     left: 0;
     background-color: #371777;
     z-index: -1;
-}
+} */
 
 .grid-container-client {
     height: 100vh;
