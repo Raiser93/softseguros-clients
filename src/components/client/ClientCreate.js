@@ -16,7 +16,7 @@ import {
     KeyboardDatePicker
 } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
-import { createClient, updateClient } from '../../actions/clients';
+import { clientStarAddNew, clientStartUpdate } from '../../actions/clients';
 
 const initialState = {
     name: '',
@@ -99,16 +99,14 @@ export const ClientCreate = () => {
 
         // Validacion para editar o crear un cliente
         if (clientActive) {
-            dispatch(updateClient(clientFormValues));
+            dispatch(clientStartUpdate(clientFormValues));
         } else {
-            dispatch(createClient({
-                ...clientFormValues,
-                id: new Date().getTime(),
-                createdAt: new Date().getTime()
+            dispatch(clientStarAddNew({
+                ...clientFormValues
             }));
         }
 
-        history.push('/client/list');
+        // history.push('/client/list');
     }
 
     return (
