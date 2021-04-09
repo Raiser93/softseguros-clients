@@ -9,7 +9,8 @@ import {
     Typography,
     Grid,
     TextField,
-    makeStyles
+    makeStyles,
+    Box
 } from '@material-ui/core';
 import { 
     MuiPickersUtilsProvider,
@@ -17,6 +18,8 @@ import {
 } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import { clientStarAddNew, clientStartUpdate } from '../../actions/clients';
+import { BackdropLoading } from '../ui/BackdropLoading';
+import { uiOpenBackDrop } from '../../actions/ui';
 
 const initialState = {
     name: '',
@@ -26,15 +29,34 @@ const initialState = {
 }
 
 const useStyle = makeStyles((theme) => ({
-    // root: {
-    //     display: 'flex'
-    // }
-   
+    'box-title': {
+        marginBottom: '1rem'
+    },
+    'box-input': {
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1)
+    },
+    'custom-input': {
+        width: '100%',
+        marginLeft: '1rem',
+        marginRight: '1rem'
+    },
+    'box-button': {
+        display: 'flex',
+        marginLeft: '1rem',
+        marginRight: '1rem',
+        justifyContent: 'flex-end',
+        '& button': {
+            marginLeft: '1rem'
+        }
+    }
 }));
 
 export const ClientCreate = () => {
     // Estilos
-    const clasess = useStyle();
+    const classes = useStyle();
 
     // Manejo de rutas
     const history = useHistory();
@@ -97,6 +119,10 @@ export const ClientCreate = () => {
             return;
         }
 
+
+        // Se abre el backdrop mientra se hace las peticiones de crear o editar
+        dispatch(uiOpenBackDrop());
+
         // Validacion para editar o crear un cliente
         if (clientActive) {
             dispatch(clientStartUpdate(clientFormValues));
@@ -112,47 +138,58 @@ export const ClientCreate = () => {
     return (
         <Grid item md={12} className="grid-item-client">
 
-            <Typography component="h4" variant="h4">
-                { 
-                    (clientActive) ? 'Modificando Cliente' : 'Nuevo Cliente'
-                }
-            </Typography>
+            {/* Titulo de la vista */}
+            <Box component="div" className={classes['box-title']}>
+                <Typography component="h4" variant="h4">
+                    { 
+                        (clientActive) ? 'Modificando Cliente' : 'Nuevo Cliente'
+                    }
+                </Typography>
+            </Box>
 
-            <form className={clasess.root} onSubmit={handleSaveChangeClient}>
-                <div>
+            {/* Formulario */}
+            <form onSubmit={handleSaveChangeClient}>
+                <Box component="div" className={classes['box-input']}>
                     {/* Input de nombre completo */}
                     <TextField
                         required
+                        className={classes['custom-input']}
                         label="Nombre Completo"
                         name="name"
                         autoComplete="off"
                         onChange={handleInputChange}
-                        value={name}></TextField>
+                        variant="outlined"
+                        value={name} />
                     
                     {/* Input de correo */}
                     <TextField
                         label="Correo"
                         required
+                        className={classes['custom-input']}
                         name="email"
                         type="email"
                         autoComplete="off"
                         onChange={handleInputChange}
-                        value={email}></TextField>
-                </div>
+                        variant="outlined"
+                        value={email} />
+                </Box>
 
-                <div>
+                <Box component="div" className={classes['box-input']}>
                     {/* Input de numero de documento */}
                     <TextField
                         label="Numero de documento"
+                        className={classes['custom-input']}
                         required
                         name="document_number"
                         type="text"
                         autoComplete="off"
                         onChange={handleInputChange}
+                        variant="outlined"
                         value={document_number}></TextField>
                     <MuiPickersUtilsProvider utils={MomentUtils}>
                         <KeyboardDatePicker
                             disableToolbar
+                            className={classes['custom-input']}
                             variant="inline"
                             format="YYYY/MM/DD"
                             label="Fecha de nacimiento"
@@ -161,19 +198,25 @@ export const ClientCreate = () => {
                             onChange={handleDateChange}
                             helperText="yyyy/mm/dd"
                             required
+                            inputVariant="outlined"
                         />
                     </MuiPickersUtilsProvider>
-                </div>
-                <Button color="secondary" variant="contained" onClick={ () => history.push('/client/list') } type="button">
-                    Cancelar
-                </Button>
+                </Box>
 
-                <Button color="primary" variant="contained" onClick={ handleSaveChangeClient } type="submit">
-                    Guardar
-                </Button>
+                {/* Acciones */}
+                <Box component="div" className={ classes['box-button'] }>
+                    <Button color="secondary" variant="contained" onClick={ () => history.push('/client/list') } type="button">
+                        Cancelar
+                    </Button>
+
+                    <Button color="primary" variant="contained" onClick={ handleSaveChangeClient } type="submit">
+                        Guardar
+                    </Button>
+                </Box>
             </form>
-
-
+            
+            {/* Vista de carga */}
+            <BackdropLoading />
         </Grid>
     )
 }
