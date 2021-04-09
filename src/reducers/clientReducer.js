@@ -1,34 +1,8 @@
-import moment from 'moment';
 import { types } from '../types/types';
 
 // Varaible iniciales temporal
 const initialState = {
-    clients: [
-        {
-            id: new Date().getTime(),
-            name: 'Brayan Giraldo Loiaza',
-            email: 'bgiraldo020@gmail.com',
-            date_birth: '1998-07-20',
-            createdAt: moment().toDate(),
-            document_number: '1225090964'
-        },
-        {
-            id: new Date().getTime() + 1,
-            name: 'Brayan Giraldo Loiaza',
-            email: 'bgiraldo020@gmail.com',
-            date_birth: '1998-07-20',
-            createdAt: moment().toDate(),
-            document_number: '1225090964'
-        },
-        {
-            id: new Date().getTime() + 2,
-            name: 'Brayan Giraldo Loiaza',
-            email: 'bgiraldo020@gmail.com',
-            date_birth: '1998-07-20',
-            createdAt: moment().toDate(),
-            document_number: '1225090964'
-        },
-    ],
+    clients: [],
     clientActive: null
 };
 
@@ -80,6 +54,13 @@ export const clientReducer = (state = initialState, action) => {
                 clients: state.clients.map(
                     e => (e.id === action.payload.id) ? action.payload : e
                 )
+            }
+        }
+        // cargar clientes
+        case types.clientLoaded: {
+            return {
+                ...state,
+                clients: [...action.payload]
             }
         }
         default:
