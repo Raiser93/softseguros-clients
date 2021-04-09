@@ -1,36 +1,76 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
+// Moment
 import moment from 'moment';
 import 'moment/locale/es';
 
+// Actions
 import { clearClientSelected, clientSelected, clientStartDelete, clientStartLoading, clientStartSearch } from '../../actions/clients';
+import { uiOpenBackDrop } from '../../actions/ui';
 
+
+// Elementos del diseño
 import {
     Grid,
     Typography,
-    TableContainer,
-    Paper,
-    Table,
-    TableRow,
-    TableCell,
-    TableHead,
-    TableBody,
     ButtonGroup,
     IconButton,
     Button,
-    TextField
+    makeStyles,
+    Box,
+    InputAdornment,
+    TextField,
+    List,
+    ListItem,
+    ListItemAvatar,
+    Avatar,
+    ListItemText,
+    ListItemSecondaryAction,
+    Divider
 } from '@material-ui/core';
+import { BackdropLoading } from '../ui/BackdropLoading';
 
+// Icons
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
-import { useHistory } from 'react-router-dom';
+import SearchIcon from '@material-ui/icons/Search';
 
+import Swal from 'sweetalert2';
 
+// Se traduce al español las fechas
 moment.locale('es');
 
+// Se declaran los estilos
+const useStyle = makeStyles((theme) => ({
+    'box-title': {
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginBottom: '1rem'
+    },
+    'box-input': {
+        width: '100%',
+        marginBottom: '1rem'
+    },
+    'text-field-search': {
+        width: '100%',
+    },
+    inline: {
+        display: 'inline'
+    },
+    'list-clients': {
+        maxHeight: '100%',
+        overflow: 'auto',
+        overflowX: 'hidden'
+    }
+}));
+
 export const ClientList = () => {
+
+    // Estilos
+    const classes = useStyle();
 
     // Clientes
     const {clients} = useSelector(state => state.client);
@@ -39,6 +79,7 @@ export const ClientList = () => {
     // Manejo de rutas
     const history = useHistory();
 
+    // Effect para cargar los clientes
     useEffect(() => {
         dispatch(clientStartLoading());
     }, [dispatch]);
@@ -54,8 +95,20 @@ export const ClientList = () => {
     /**
      * Funcion para eliminar/cambiar de estado el cliente seleccionado
      */
-    const handleRemoveClient = (idClient) => {
-        dispatch(clientStartDelete(idClient));
+    const handleRemoveClient = async (idClient) => {
+
+        const { value } = await Swal.fire({
+            title: '¿Seguro desea eliminar el cliente?',
+            showCancelButton: true,
+            cancelButtonText: 'No',
+            confirmButtonText: 'Sí',
+            icon: 'warning'
+        });
+
+        if (value) {
+            dispatch(uiOpenBackDrop());
+            dispatch(clientStartDelete(idClient));
+        }
     }
 
     /**
@@ -66,6 +119,7 @@ export const ClientList = () => {
         history.push('/client/create');
     }
 
+    // Funcion para buscar clientes
     const hanldeKeyEnter = (event) => {
         if (event.key === 'Enter') {
             const char = event.target.value || '';
@@ -79,73 +133,99 @@ export const ClientList = () => {
 
     return (
         <Grid item md={12} className="grid-item-client">
-            <Typography component="h4" variant="h4">
-                Listado Clientes
-            </Typography>
 
-            <Button
-                onClick={handleGoToCreateClient}
-                variant="contained"
-                color="default"
-                disableElevation={true}
-                startIcon={ <AddIcon />}>
-                Nuevo Cliente
-            </Button>
+            <Box component="div" className={classes['box-title']}>
+                {/* Titulo de la vista */}
+                <Typography component="h4" variant="h4">
+                    Listado Clientes
+                </Typography>
 
-            <TextField
-                onKeyUp={hanldeKeyEnter}
-            />
+                {/* Boton para redireccionar a la vista de crear cliente */}
+                <Button
+                    onClick={handleGoToCreateClient}
+                    variant="contained"
+                    color="default"
+                    disableElevation
+                    startIcon={ <AddIcon />}>
+                    Nuevo Cliente
+                </Button>
+            </Box>
 
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align="center">Nombre</TableCell>
-                            <TableCell align="center">Email</TableCell>
-                            <TableCell align="center">Fecha de Nacimiento</TableCell>
-                            <TableCell align="center">Fecha de creación</TableCell>
-                            <TableCell align="center">Acciones</TableCell>
-                        </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                        {clients.map((client) => (
-                            <TableRow key={client.id}>
-                                <TableCell align="center">
-                                    { client.name }
-                                </TableCell>
-
-                                <TableCell align="center">
-                                    { client.email }
-                                </TableCell>
-
-                                <TableCell align="center">
-                                    { moment(client.date_birth).format('YYYY MMMM DD') }
-                                </TableCell>
-
-                                <TableCell align="center">
-                                    { moment(client.createdAt).format('YYYY MMMM DD') }
-                                </TableCell>
-
-                                <TableCell align="center">
-                                    <ButtonGroup>
-
-                                        <IconButton color="primary" onClick={ (e) => {handleEditClient(client)} }>
-                                            <EditIcon />
-                                        </IconButton>
-
-                                        <IconButton color="secondary" onClick={ (e) => {handleRemoveClient(client.id)} }>
-                                            <DeleteIcon />
-                                        </IconButton>
-
-                                    </ButtonGroup>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <Box component="div" className={classes['box-input']}>
+                {/* Campo de texto para buscar clientes */}
+                <TextField
+                    onKeyUp={hanldeKeyEnter}
+                    className={classes['text-field-search']}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                    placeholder="Buscar Cliente, Ingrese nombre o fecha de nacimiento"
+                    variant="outlined"
+                />
+            </Box>
             
+            <List className={classes['list-clients']}>
+                { clients.map((client) => (
+                    
+                    <Box key={client.id} component="div">
+                        <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                                <Avatar>
+                                    {
+                                        // Se muestra la letra inicial del nombre del cliente
+                                        client.name[0].toUpperCase()
+                                    }
+                                </Avatar>
+                            </ListItemAvatar>
+
+                            <ListItemText
+                                // Nombre del cliente
+                                primary={client.name}
+                                secondary={
+                                    <React.Fragment>
+                                        {/* Correo del cliente */}
+                                        <Typography
+                                            component="span"
+                                            variant="body2"
+                                            className={classes.inline}
+                                            color="textPrimary"
+                                        >
+                                            { client.email }
+                                        </Typography>
+                                        {/* Fecha de nacimiento | fecha de creación */}
+                                        { ` - ${moment(client.date_birth).format('YYYY MMMM DD')} | ${moment(client.createdAt).format('YYYY MMMM DD')}` }
+                                    </React.Fragment>
+                                }
+                            />
+
+                            <ListItemSecondaryAction>
+                                <ButtonGroup>
+
+                                    {/* Boton para editar cliente */}
+                                    <IconButton color="primary" onClick={ (e) => {handleEditClient(client)} }>
+                                        <EditIcon />
+                                    </IconButton>
+
+                                    {/* Boton para eliminar cliente */}
+                                    <IconButton color="secondary" onClick={ (e) => {handleRemoveClient(client.id)} }>
+                                        <DeleteIcon />
+                                    </IconButton>
+
+                                </ButtonGroup>
+                            </ListItemSecondaryAction>
+                        </ListItem>
+                        <Divider key={client.id} variant="inset" component="li" />
+                    </Box>
+
+                )) }
+
+            </List>
+            
+            <BackdropLoading />
         </Grid>
     )
 }
