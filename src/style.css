@@ -12,17 +12,6 @@
     position: relative;
 }
 
-/* .main::before {
-    content: "";
-    position: absolute;
-    height: 30%;
-    width: 100%;
-    top: 0;
-    left: 0;
-    background-color: #371777;
-    z-index: -1;
-} */
-
 .grid-container-client {
     height: 100vh;
 }
