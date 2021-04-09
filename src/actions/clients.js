@@ -17,10 +17,13 @@ export const clientStartDelete = (idClient) => {
             const resp = await fetchDefault(`client/change-status-client/${idClient}`, {}, 'PUT');
             const body = await resp.json();
 
+            dispatch(uiCloseBackDrop());
+
             if (body.ok) {
+                Swal.fire('Se ha eliminado el cliente', '', 'success');
                 dispatch(clientDelete(idClient));
             } else {
-
+                Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
             console.log(error);
@@ -53,8 +56,13 @@ export const clientStarAddNew = (client) => {
             const resp = await fetchDefault('client/create-client', client, 'POST');
             const body = await resp.json();
     
-            console.log(body);
+            dispatch(uiCloseBackDrop());
             if (body.ok) {
+                Swal.fire(
+                    'Se ha creado un cliente',
+                    `${client.name} - ${client.email}`,
+                    'success'
+                );
                 dispatch(createClient(body.client))
             } else {
                 Swal.fire('Error', body.msg, 'error');
@@ -69,6 +77,10 @@ const createClient = (client) => ({
     type: types.createClient,
     payload: client
 });
+// Cerrar el backDrop
+const uiCloseBackDrop = () => ({
+    type: types.uiCloseBackDrop,
+});
 
 // Accion para actualizar un cliente de la base de datos
 export const clientStartUpdate = (client) => {
@@ -77,11 +89,18 @@ export const clientStartUpdate = (client) => {
         try {
             const resp = await fetchDefault(`client/update-client/${client.id}`, client, 'PUT');
             const body = await resp.json();
+            
+            dispatch(uiCloseBackDrop());
 
             if (body.ok) {
+                Swal.fire(
+                    'Se ha modificado un cliente',
+                    `${client.name} - ${client.email}`,
+                    'success'
+                );
                 dispatch(updateClient(client));
             } else {
-
+                Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
             console.log(error);            
@@ -109,6 +128,8 @@ export const clientStartLoading = () => {
 
             if (body.ok) {
                 dispatch(clientLoaded(body.clients));
+            } else {
+                Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
             console.log(error);
@@ -129,10 +150,9 @@ export const clientStartSearch = (char) => {
             const body = await resp.json();
             
             if (body.ok) {
-                console.log(body);
                 dispatch(clientLoaded(body.clients));
             } else {
-
+                Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
             console.log(error);
