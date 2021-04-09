@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 
 import moment from 'moment';
 import 'moment/locale/es';
 
-import { clearClientSelected, clientDelete, clientSelected } from '../../actions/clients';
+import { clearClientSelected, clientSelected, clientStartDelete, clientStartLoading, clientStartSearch } from '../../actions/clients';
 
 import {
     Grid,
@@ -18,7 +18,8 @@ import {
     TableBody,
     ButtonGroup,
     IconButton,
-    Button
+    Button,
+    TextField
 } from '@material-ui/core';
 
 import EditIcon from '@material-ui/icons/Edit';
@@ -38,6 +39,10 @@ export const ClientList = () => {
     // Manejo de rutas
     const history = useHistory();
 
+    useEffect(() => {
+        dispatch(clientStartLoading());
+    }, [dispatch]);
+
     /**
      * Funcion para seleccionar un cliente a editar y redireccionar a la vista de crear cliente
      */
@@ -50,7 +55,7 @@ export const ClientList = () => {
      * Funcion para eliminar/cambiar de estado el cliente seleccionado
      */
     const handleRemoveClient = (idClient) => {
-        dispatch(clientDelete(idClient));
+        dispatch(clientStartDelete(idClient));
     }
 
     /**
@@ -59,6 +64,17 @@ export const ClientList = () => {
     const handleGoToCreateClient = () => {
         dispatch(clearClientSelected());
         history.push('/client/create');
+    }
+
+    const hanldeKeyEnter = (event) => {
+        if (event.key === 'Enter') {
+            const char = event.target.value || '';
+            if (char.trim().length) {
+                dispatch(clientStartSearch(char));
+            } else {
+                dispatch(clientStartLoading());
+            }
+        }
     }
 
     return (
@@ -75,6 +91,10 @@ export const ClientList = () => {
                 startIcon={ <AddIcon />}>
                 Nuevo Cliente
             </Button>
+
+            <TextField
+                onKeyUp={hanldeKeyEnter}
+            />
 
             <TableContainer component={Paper}>
                 <Table>
