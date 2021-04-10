@@ -129,7 +129,7 @@ export const ClientCreate = () => {
         } else {
             dispatch(clientStarAddNew({
                 ...clientFormValues
-            }));
+            }, history));
         }
 
         // history.push('/client/list');
