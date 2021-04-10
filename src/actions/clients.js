@@ -26,7 +26,8 @@ export const clientStartDelete = (idClient) => {
                 Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
-            console.log(error);
+            dispatch(uiCloseBackDrop());
+            Swal.fire('Error', 'Ocurrio un error al eliminar un cliente', 'error');
         }
     }
 }
@@ -49,7 +50,7 @@ export const clearClientSelected = () => ({
 /**
  * Accion para almacenar un cliente
  */
-export const clientStarAddNew = (client) => {
+export const clientStarAddNew = (client, history) => {
     return async(dispatch) => {
         console.log(client);
         try {
@@ -63,12 +64,14 @@ export const clientStarAddNew = (client) => {
                     `${client.name} - ${client.email}`,
                     'success'
                 );
-                dispatch(createClient(body.client))
+                dispatch(createClient(body.client));
+                history.push('/client/list');
             } else {
                 Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
-            
+            dispatch(uiCloseBackDrop());
+            Swal.fire('Error', 'Ocurrio un error al crear un cliente', 'error');
         }
     }
 };
@@ -103,7 +106,8 @@ export const clientStartUpdate = (client) => {
                 Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
-            console.log(error);            
+            dispatch(uiCloseBackDrop());
+            Swal.fire('Error', 'Ocurrio un error al modificar un clientes', 'error');
         }
     }
 }
@@ -132,7 +136,8 @@ export const clientStartLoading = () => {
                 Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
-            console.log(error);
+            dispatch(uiCloseBackDrop());
+            Swal.fire('Error', 'Ocurrio un error al obtener los clientes', 'error');
         }
     }
 }
@@ -155,7 +160,8 @@ export const clientStartSearch = (char) => {
                 Swal.fire('Error', body.msg, 'error');
             }
         } catch (error) {
-            console.log(error);
+            dispatch(uiCloseBackDrop());
+            Swal.fire('Error', 'Ocurrio un error al buscar los clientes', 'error');
         }
     }
 }
